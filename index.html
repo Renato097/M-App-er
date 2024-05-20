@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MApper</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/favicon_package/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon_package/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon_package/favicon-16x16.png">
+    <link rel="manifest" href="/img/favicon_package/site.webmanifest">
+    <link rel="mask-icon" href="/img/favicon_package/safari-pinned-tab.svg" color="#4b97df">
+    <link rel="shortcut icon" href="/img/favicon_package/favicon.ico">
+    <meta name="msapplication-TileColor" content="#2d89ef">
+    <meta name="msapplication-config" content="/img/favicon_package/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
+
+    <script src="jquery-3.7.1.min.js"></script>
+</head>
+
+<body>
+    <main>
+        <!-- Map -->
+        <section class="map">
+        </section>
+
+        <!-- Menu -->
+        <section class="menu">
+            <!-- Actions -->
+            <ul class="actions">
+                <li><button id="draw" class="active"><i class="fa-solid fa-pencil"></i></button></li>
+                <li><button id="erase" class=""><i class="fa-solid fa-eraser"></i></button></li>
+                <li><button id="pin" class=""><i class="fa-solid fa-map-pin"></i></button></li>
+                <li><button id="clear" class=""><i class="fa-solid fa-ban"></i> Clear All <i class="fa-solid fa-ban"></i></button></li>
+                <li><button id="drawAll" class=""><i class="fa-solid fa-fill-drip"></i> Fill All <i class="fa-solid fa-fill-drip fa-flip-horizontal"></i></button></li>
+                <li><input type="range" id="sizeSel" min="50" max="200" value="70" step="10"><span></span></li>
+            </ul>
+            <!-- Tileset -->
+            <div class="setLabel">
+                <span>Tiles:</span><button id="rotateBtn"><i class="fa-solid fa-rotate-right"></i></button>
+            </div>
+            <ul class="tiles">
+            </ul>
+            <!-- Pinset -->
+            <div class="setLabel">
+                <span>Pins:</span><input type="text" id="pinText" placeholder="Tag" onfocus="this.value=''">
+            </div>
+            <ul class="pins">
+            </ul>
+            <span id="WxH"></span>
+        </section>
+    </main>
+
+
+    <script>
+        function getAllTile(folder) {
+            var dir = `/img/${folder}set/`;
+            var fileextension = ".png";
+
+            $.ajax({
+                //This will retrieve the contents of the folder if the folder is configured as 'browsable'
+                url: dir,
+                success: function (data) {
+                    $(data).find("a:contains(" + fileextension + ")").each(function (index) {
+                        let imgSrc = this.href.replace(window.location.host, "").replace("http://", "");
+
+                        let img = new Image()
+                        img.className = folder.charAt(0)
+                        img.src = imgSrc
+
+                        let li = document.createElement('li')
+                        li.classList.add(folder)
+                        li.title = imgSrc.replace(`/img/${folder}set/`, '').replace("_rand", '').replace("_ang", '').replace(".png", '')
+
+                        if (imgSrc.indexOf("_rand") >= 0) { li.classList.add("rand") }
+                        if (imgSrc.indexOf("_ang") >= 0) { li.classList.add("ang") }
+
+                        li.appendChild(img)
+                        $(`ul.${folder}s`).append(li)
+                    });
+                }
+            });
+        }
+        
+        getAllTile("tile");
+        getAllTile("pin");
+
+        // Load the index.js script when the DOM in ready
+        $(document).ready(function () {
+            $.getScript("./index.js");
+        });
+    </script>
+</body>
+
+</html>
